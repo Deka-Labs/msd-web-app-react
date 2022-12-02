@@ -13,6 +13,9 @@ function Navigation(): JSX.Element {
         location === '/cache/add' ||
         location === '/cache/edit';
 
+    const is_login = location === '/login'
+    const is_signup = location === '/signup'
+
 
     return (
         <header>
@@ -26,8 +29,8 @@ function Navigation(): JSX.Element {
                         <Nav.Link active={is_my_cache} href="/cache/my">Мои тайники</Nav.Link>
                     </Nav>
                     <Nav>
-                        <Nav.Link active href="/">Войти</Nav.Link>
-                        <Nav.Link active href="/cache">Зарегистрироваться</Nav.Link>
+                        <Nav.Link active={is_login} href="/login">Войти</Nav.Link>
+                        <Nav.Link active={is_signup} href="/signup">Зарегистрироваться</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Navbar>
