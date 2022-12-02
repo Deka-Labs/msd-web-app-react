@@ -17,8 +17,8 @@ function Navigation(): JSX.Element {
     return (
         <header>
             <Navbar bg="primary" variant="dark" expand="lg">
-                <Navbar.Brand href="#">КАРТофель</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Brand className="mx-4" href="#">КАРТофель</Navbar.Brand>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" className="mx-4" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
                         <Nav.Link active={is_home} href="/">Домой</Nav.Link>
