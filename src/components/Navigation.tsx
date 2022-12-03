@@ -16,6 +16,8 @@ function Navigation(): JSX.Element {
     const is_login = location === '/login'
     const is_signup = location === '/signup'
 
+    const user_loggedin = !!localStorage.getItem("user_id")
+
 
     return (
         <header>
@@ -26,11 +28,23 @@ function Navigation(): JSX.Element {
                     <Nav className="me-auto">
                         <Nav.Link active={is_home} href="/">Домой</Nav.Link>
                         <Nav.Link active={is_cache} href="/cache">Тайники</Nav.Link>
-                        <Nav.Link active={is_my_cache} href="/cache/my">Мои тайники</Nav.Link>
+                        {user_loggedin &&
+                            <Nav.Link active={is_my_cache} href="/cache/my">Мои тайники</Nav.Link>
+                        }
+
                     </Nav>
                     <Nav>
-                        <Nav.Link active={is_login} href="/login">Войти</Nav.Link>
-                        <Nav.Link active={is_signup} href="/signup">Зарегистрироваться</Nav.Link>
+                        {user_loggedin &&
+                            <Nav.Link href="/" onClick={(_) => localStorage.clear()}>Выйти</Nav.Link>}
+                        {!user_loggedin &&
+                            <>
+                                <Nav.Link active={is_login} href="/login">Войти</Nav.Link>
+                                <Nav.Link active={is_signup} href="/signup">Зарегистрироваться</Nav.Link>
+                            </>
+                        }
+
+
+
                     </Nav>
                 </Navbar.Collapse>
             </Navbar>
