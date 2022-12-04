@@ -1,6 +1,7 @@
 import { AxiosError, isAxiosError } from "axios"
 import React, { useState } from "react"
 import { Button, Container, Form, Row } from "react-bootstrap"
+import { useNavigate } from "react-router-dom"
 import { CacheCreateInfo, cache_service_insert_cache } from "../../api/cache_service"
 import { MapSelectPoint } from "../../components/MapSelectPoint"
 
@@ -18,6 +19,8 @@ function Add(): JSX.Element {
         description: "",
         hint: "",
     })
+
+    const navigate = useNavigate();
 
     function onPositionChange(pos: L.LatLng) {
         setState({ ...state, position: pos })
@@ -47,6 +50,7 @@ function Add(): JSX.Element {
         cache_service_insert_cache(create_info).then(
             (response) => {
                 alert("Добавлено")
+                navigate("/cache/my")
             }
         ).catch(
             (reason: Error | AxiosError) => {
