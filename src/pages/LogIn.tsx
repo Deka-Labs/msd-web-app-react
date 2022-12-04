@@ -68,13 +68,13 @@ class LogIn extends React.Component<any, LogInState> {
             (reason: Error | AxiosError) => {
                 if (isAxiosError(reason)) {
                     // Conflict: Means already registred
-                    if (reason.status === 409) {
+                    if (reason.response?.status === 409) {
                         alert("Пользователь уже зарегистрирован")
-                    } else if (reason.status === 400) { // Invalid format
+                    } else if (reason.response?.status === 400) { // Invalid format
                         alert("Невреный формат данных")
                     } else {
                         alert("Внутреняя ошибка, попробуйте позже")
-                        console.log("Status code:", reason.status);
+                        console.log("Status code:", reason.response?.status);
                         console.log("Body:", reason.toJSON());
                     }
                 } else {
