@@ -29,7 +29,7 @@ export function MapSelectPoint(props: MapSelectPointProps) {
 
     return (
         <>
-            <MapContainer center={[59.9, 30.20]} zoom={13} className="min-vh-100">
+            <MapContainer center={[59.9, 30.20]} zoom={13} className="map-container">
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

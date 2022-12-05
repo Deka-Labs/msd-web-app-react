@@ -4,9 +4,9 @@ import StickyFooter from "./StickyFooter";
 
 function Layout(): JSX.Element {
     return (
-        <div className="d-flex flex-column min-vh-100">
+        <div className="d-flex flex-column vh-100">
             <Navigation />
-            <main className="flex-shrink-0">
+            <main className="flex-fill">
                 <Outlet />
             </main>
             <StickyFooter />

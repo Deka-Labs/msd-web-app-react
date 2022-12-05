@@ -76,11 +76,11 @@ function Add(): JSX.Element {
 
 
     return (
-        <div className="container-fluid">
+        <div className="d-flex flex-column container-fluid h-100">
             <div className="row">
                 <h1 className="text-center">Добавить тайник</h1>
             </div>
-            <div className="row">
+            <div className="row flex-fill">
                 <div className="col-xl-8">
                     <MapSelectPoint position={state.position} position_changed={onPositionChange}></MapSelectPoint>
                 </div>
