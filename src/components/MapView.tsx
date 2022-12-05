@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { cache_service_get_caches, CacheView } from "../api/cache_service";
 import { CacheMarker } from "./CacheMarker";
@@ -7,9 +7,11 @@ import { CacheMarker } from "./CacheMarker";
 type MapEventProps = {
     cacheSelected: (id: string) => void
     user_id?: number | null
+    // This boolean value used to force update 
+    reupdate_trigger: boolean
 }
 
-function MapEventHandler({ user_id = null, cacheSelected }: MapEventProps) {
+function MapEventHandler({ user_id = null, cacheSelected, reupdate_trigger }: MapEventProps) {
     const map = useMap()
 
     const [view, setView] = useState<CacheView | null>(null);
@@ -23,6 +25,11 @@ function MapEventHandler({ user_id = null, cacheSelected }: MapEventProps) {
             }
         ).catch((r) => console.log(r))
     }
+
+    useEffect(() => {
+        fetchCaches()
+    },
+        [reupdate_trigger]);
 
 
     useMapEvents({
@@ -64,9 +71,11 @@ function MapEventHandler({ user_id = null, cacheSelected }: MapEventProps) {
 export type MapViewProps = {
     cacheSelected: (id: string) => void
     user_id?: number | null
+    // This boolean value used to force update 
+    reupdate_trigger?: boolean
 }
 
-export function MapView({ user_id = null, cacheSelected }: MapViewProps) {
+export function MapView({ user_id = null, cacheSelected, reupdate_trigger = false }: MapViewProps) {
 
     return (
         <MapContainer center={[59.9, 30.20]} zoom={13} className="map-container">
@@ -75,7 +84,7 @@ export function MapView({ user_id = null, cacheSelected }: MapViewProps) {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            <MapEventHandler user_id={user_id} cacheSelected={cacheSelected}></MapEventHandler>
+            <MapEventHandler user_id={user_id} cacheSelected={cacheSelected} reupdate_trigger={reupdate_trigger}></MapEventHandler>
 
         </MapContainer>
 

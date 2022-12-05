@@ -1,10 +1,12 @@
+import { AxiosError, isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { Button, Container, Form, Row } from "react-bootstrap";
-import { Cache, cache_service_get_cache } from '../api/cache_service'
+import { Cache, cache_service_delete_cache, cache_service_get_cache } from '../api/cache_service'
 
 type CacheViewProps = {
     selected_id?: string | null,
     unlocked?: boolean // Means that add, delete, edit buttons avaiable
+    onCacheDeleted?: (() => void) | null
 }
 
 type CacheViewState = {
@@ -12,7 +14,7 @@ type CacheViewState = {
     show_hint: boolean
 }
 
-export function CacheView({ selected_id = null, unlocked = false }: CacheViewProps) {
+export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted = null }: CacheViewProps) {
 
     const [state, setState] = useState<CacheViewState>(
         {
@@ -26,11 +28,34 @@ export function CacheView({ selected_id = null, unlocked = false }: CacheViewPro
             cache_service_get_cache(selected_id).then((r) => {
                 let cache_view = r.data;
                 setState({ ...state, cache: cache_view.caches[0] });
-            })
+            }).catch(
+                (reason: Error | AxiosError) => {
+                    if (isAxiosError(reason)) {
+                        // Conflict: Means already registred
+                        if (reason.response?.status === 404) {
+                            alert("Этот тайник удален")
+                            if (onCacheDeleted) onCacheDeleted();
+                        } else {
+                            alert("Внутреняя ошибка, попробуйте позже")
+                            console.log("Status code:", reason.response?.status);
+                            console.log("Body:", reason.toJSON());
+                        }
+                    } else {
+                        alert(reason)
+                    }
+
+                })
         }
     }, [selected_id])
 
 
+    const deleteSelected = () => {
+        if (selected_id && onCacheDeleted) {
+            cache_service_delete_cache(selected_id).then(() => {
+                onCacheDeleted()
+            })
+        }
+    }
 
 
     let view_cache_part = <></>
@@ -107,7 +132,7 @@ export function CacheView({ selected_id = null, unlocked = false }: CacheViewPro
                 {unlocked &&
                     <Row>
                         <Container className="d-flex justify-content-center">
-                            <Button className="mt-3 w-75">Изменить</Button>
+                            <Button className="mt-3 w-75" href={`/cache/edit/${selected_id}`}>Изменить</Button>
                         </Container>
                     </Row>
                 }
@@ -115,7 +140,7 @@ export function CacheView({ selected_id = null, unlocked = false }: CacheViewPro
                 {unlocked &&
                     <Row>
                         <Container className="d-flex justify-content-center">
-                            <Button className="mt-3 w-75">Удалить</Button>
+                            <Button className="mt-3 w-75" onClick={deleteSelected}>Удалить</Button>
                         </Container>
                     </Row>
                 }

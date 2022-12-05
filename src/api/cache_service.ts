@@ -41,18 +41,23 @@ function api_route(path: string): string {
     return base + "/" + path
 }
 
-export function cache_service_insert_cache(create_info: CacheCreateInfo) {
-    const cache_route = api_route("cache");
+function auth_headers(): any {
     let user = localStorage.getItem("user_email") || "";
     let pass = localStorage.getItem("password") || "";
 
     let credentials = user + ":" + pass;
     let enc_cred = Buffer.from(credentials).toString('base64')
 
+    return {
+        Authorization: "Basic " + enc_cred
+    }
+}
+
+export function cache_service_insert_cache(create_info: CacheCreateInfo) {
+    const cache_route = api_route("cache");
+
     return axios.post<CacheAdded>(cache_route, create_info, {
-        headers: {
-            Authorization: "Basic " + enc_cred
-        }
+        headers: auth_headers()
     })
 }
 
@@ -90,4 +95,9 @@ export function cache_service_get_caches(user_id: number | null, sw_bound: L.Lat
 export function cache_service_get_cache(cache_id: string) {
     const cache_route = api_route(`cache/${cache_id}`);
     return axios.get<CacheView>(cache_route)
+}
+
+export function cache_service_delete_cache(cache_id: string) {
+    const cache_route = api_route(`cache/${cache_id}`);
+    return axios.delete<any>(cache_route, { headers: auth_headers() })
 }

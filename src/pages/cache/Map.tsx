@@ -4,6 +4,7 @@ import { MapView } from "../../components/MapView"
 
 type MapState = {
     selected_cache_id: string | null,
+    reupdate_trigger: boolean,
 }
 
 function Map(): JSX.Element {
@@ -11,6 +12,7 @@ function Map(): JSX.Element {
     const [state, setState] = useState<MapState>(
         {
             selected_cache_id: null,
+            reupdate_trigger: false,
         }
     );
 
@@ -21,6 +23,15 @@ function Map(): JSX.Element {
         })
     }
 
+    const onCacheDeleted = () => {
+        setState({
+            ...state,
+            selected_cache_id: null,
+            reupdate_trigger: !state.reupdate_trigger,
+        })
+
+    }
+
 
     return (
         <div className="d-flex flex-column container-fluid h-100">
@@ -29,10 +40,10 @@ function Map(): JSX.Element {
             </div>
             <div className="row flex-fill">
                 <div className="col-xl-8">
-                    <MapView cacheSelected={onCacheSelected}></MapView>
+                    <MapView reupdate_trigger={state.reupdate_trigger} cacheSelected={onCacheSelected}></MapView>
                 </div>
                 <div className="col">
-                    <CacheView selected_id={state.selected_cache_id}></CacheView>
+                    <CacheView selected_id={state.selected_cache_id} onCacheDeleted={onCacheDeleted}></CacheView>
                 </div>
             </div>
         </div>
