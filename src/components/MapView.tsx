@@ -10,9 +10,10 @@ type MapState = {
 
 type MapEventProps = {
     cacheSelected: (id: string) => void
+    user_id?: number | null
 }
 
-function MapEventHandler(props: MapEventProps) {
+function MapEventHandler({ user_id = null, cacheSelected }: MapEventProps) {
     const map = useMap()
 
     const [view, setView] = useState<CacheView | null>(null);
@@ -20,7 +21,7 @@ function MapEventHandler(props: MapEventProps) {
     const fetchCaches = async () => {
         let bounds = map.getBounds();
 
-        cache_service_get_caches(null, bounds.getSouthWest(), bounds.getNorthEast()).then(
+        cache_service_get_caches(user_id, bounds.getSouthWest(), bounds.getNorthEast()).then(
             (response) => {
                 setView(response.data)
             }
@@ -38,7 +39,7 @@ function MapEventHandler(props: MapEventProps) {
     }
 
     const select_function = (id: string) => {
-        props.cacheSelected(id)
+        cacheSelected(id)
     }
 
     const markers = view?.caches.map((c) => {
@@ -66,9 +67,10 @@ function MapEventHandler(props: MapEventProps) {
 
 export type MapViewProps = {
     cacheSelected: (id: string) => void
+    user_id?: number | null
 }
 
-export function MapView(p: MapViewProps) {
+export function MapView({ user_id = null, cacheSelected }: MapViewProps) {
 
     return (
         <MapContainer center={[59.9, 30.20]} zoom={13} className="map-container">
@@ -77,7 +79,7 @@ export function MapView(p: MapViewProps) {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            <MapEventHandler cacheSelected={p.cacheSelected}></MapEventHandler>
+            <MapEventHandler user_id={user_id} cacheSelected={cacheSelected}></MapEventHandler>
 
         </MapContainer>
 

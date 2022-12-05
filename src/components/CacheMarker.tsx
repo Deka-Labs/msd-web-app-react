@@ -1,4 +1,5 @@
 import { Marker } from "react-leaflet"
+import { marker_icon } from "../leaflet-marker"
 
 type CacheMarkerProps = {
     position: L.LatLng,
@@ -12,6 +13,7 @@ export function CacheMarker(props: CacheMarkerProps) {
         <Marker
             position={props.position}
             key={props.cache_id}
+            icon={marker_icon()}
 
             eventHandlers={{
                 click: () => {
