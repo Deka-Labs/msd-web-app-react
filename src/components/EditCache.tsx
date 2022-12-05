@@ -75,7 +75,7 @@ export function EditCache({ cache_id = null, dataSubmitted }: EditCacheParams) {
 
                 })
         }
-    }, [cache_id])
+    }, [cache_id, navigate])
 
 
     // We have not loaded cache to edit yet
