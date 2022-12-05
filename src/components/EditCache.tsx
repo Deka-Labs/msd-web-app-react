@@ -83,7 +83,7 @@ export function EditCache({ cache_id = null, dataSubmitted }: EditCacheParams) {
         return (
             <div className="d-flex flex-column container-fluid h-100">
                 <div className="row">
-                    <h1 className="text-center">Добавить тайник</h1>
+                    <h1 className="text-center">Измениить тайник</h1>
                 </div>
                 <div className="row">
                     <h1 className="text-center">Ожидайте, тайник загружается</h1>
@@ -95,7 +95,9 @@ export function EditCache({ cache_id = null, dataSubmitted }: EditCacheParams) {
     return (
         <div className="d-flex flex-column container-fluid h-100">
             <div className="row">
-                <h1 className="text-center">Добавить тайник</h1>
+                <h1 className="text-center">
+                    {cache_id ? "Изменить тайник" : "Добавить тайник"}
+                </h1>
             </div>
             <div className="row flex-fill">
                 <div className="col-xl-8">

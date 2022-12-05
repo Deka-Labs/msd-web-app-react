@@ -101,3 +101,9 @@ export function cache_service_delete_cache(cache_id: string) {
     const cache_route = api_route(`cache/${cache_id}`);
     return axios.delete<any>(cache_route, { headers: auth_headers() })
 }
+
+export function cache_service_update_cache(cache: Cache) {
+    let cache_id = cache._id.$oid
+    const cache_route = api_route(`cache/${cache_id}`);
+    return axios.put<any>(cache_route, cache, { headers: auth_headers() })
+}

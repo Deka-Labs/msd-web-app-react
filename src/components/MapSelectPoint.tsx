@@ -1,6 +1,8 @@
-import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
+import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import L from 'leaflet'
 import { marker_icon } from "../leaflet-marker";
+import { useEffect } from "react";
+import { MapCenterAtCurrentLocation } from "./MapCenterAtCurrentLocation";
 
 type MapSelectPointProps = {
     position: L.LatLng | null | undefined
@@ -8,10 +10,20 @@ type MapSelectPointProps = {
 }
 
 export function SelectedPoint(props: MapSelectPointProps) {
+    const map = useMap();
+
+    useEffect(() => {
+        if (props.position) {
+            map.flyTo(props.position)
+        }
+
+    }, [])
+
     useMapEvents({
         click: (e) => {
             if (props.position_changed) {
                 props.position_changed(e.latlng)
+                map.flyTo(e.latlng)
             }
         }
     })
@@ -25,16 +37,15 @@ export function SelectedPoint(props: MapSelectPointProps) {
 
 export function MapSelectPoint(props: MapSelectPointProps) {
 
-
-
     return (
         <>
-            <MapContainer center={[59.9, 30.20]} zoom={13} className="map-container">
+            <MapContainer center={[59.9, 30.20]} zoom={11} className="map-container">
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <SelectedPoint position={props.position} position_changed={props.position_changed} />
+                <MapCenterAtCurrentLocation></MapCenterAtCurrentLocation>
             </MapContainer>
         </>
     )
