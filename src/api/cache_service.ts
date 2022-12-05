@@ -7,6 +7,21 @@ export type CacheCreateInfo = {
     hint: string,
 }
 
+export type ObjectID = {
+    $oid: string,
+}
+
+export type Cache = {
+    _id: ObjectID,
+    position: L.LatLng,
+    description: string,
+    hint: string,
+}
+
+export type CacheView = {
+    caches: Cache[]
+}
+
 export type CacheAdded = {
     id: number
 }
@@ -39,4 +54,40 @@ export function cache_service_insert_cache(create_info: CacheCreateInfo) {
             Authorization: "Basic " + enc_cred
         }
     })
+}
+
+export function cache_service_get_caches(user_id: number | null, sw_bound: L.LatLng, ne_bound: L.LatLng) {
+    const cache_route = api_route("cache");
+
+    type GetParams = {
+        user_id?: number,
+
+        min_lat?: number,
+        max_lat?: number,
+
+        min_long?: number,
+        max_long?: number,
+    }
+
+    let params: GetParams = {
+        min_lat: sw_bound.lat,
+        max_lat: ne_bound.lat,
+        min_long: sw_bound.lng,
+        max_long: ne_bound.lng,
+    }
+
+    if (user_id) {
+        params.user_id = user_id;
+    }
+
+
+
+    return axios.get<CacheView>(cache_route, {
+        params: params,
+    })
+}
+
+export function cache_service_get_cache(cache_id: string) {
+    const cache_route = api_route(`cache/${cache_id}`);
+    return axios.get<CacheView>(cache_route)
 }

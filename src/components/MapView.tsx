@@ -1,96 +1,85 @@
-import React from "react";
-import { Button, Container, Fade, Row } from "react-bootstrap";
-import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import { useState } from "react";
+import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { cache_service_get_caches, CacheView } from "../api/cache_service";
+import { CacheMarker } from "./CacheMarker";
 
 
 type MapState = {
     show_hint: boolean,
 }
 
-export class MapView extends React.Component<any, MapState> {
-    constructor(props: any) {
-        super(props)
-        this.state = {
-            show_hint: false,
-        }
+type MapEventProps = {
+    cacheSelected: (id: string) => void
+}
+
+function MapEventHandler(props: MapEventProps) {
+    const map = useMap()
+
+    const [view, setView] = useState<CacheView | null>(null);
+
+    const fetchCaches = async () => {
+        let bounds = map.getBounds();
+
+        cache_service_get_caches(null, bounds.getSouthWest(), bounds.getNorthEast()).then(
+            (response) => {
+                setView(response.data)
+            }
+        ).catch((r) => console.log(r))
     }
 
-    render(): React.ReactNode {
+
+    useMapEvents({
+        zoomend: fetchCaches,
+        moveend: fetchCaches,
+    })
+
+    if (!view) {
+        return (<></>)
+    }
+
+    const select_function = (id: string) => {
+        props.cacheSelected(id)
+    }
+
+    const markers = view?.caches.map((c) => {
         return (
-            <Container>
-                <Row>
-                    <MapContainer center={[59.9, 30.20]} zoom={13} className="col-xl-8 min-vh-100">
-                        <TileLayer
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        <Marker position={[59.9, 30.20]}>
-                        </Marker>
-                    </MapContainer>
+            <CacheMarker
+                position={c.position}
+                key={c._id.$oid}
+                cache_id={c._id.$oid}
 
-                    <div className="col-xl-4">
-                        <h4>Выбрана точка:</h4>
-                        <table>
-                            <tr>
-                                <td><b className="p-2">Идентификатор:</b></td>
-                                <td className="p-2">94</td>
-                            </tr>
-                            <tr>
-                                <td><b className="p-2">Создатель:</b></td>
-                                <td className="p-2">ДЕСЕРТ С КУРИЦЕЙ</td>
-                            </tr>
-                            <tr>
-                                <td><b className="p-2">Широта:</b></td>
-                                <td className="p-2">59.9999221</td>
-                            </tr>
-                            <tr>
-                                <td><b className="p-2">Долгота:</b></td>
-                                <td className="p-2">30.22222222</td>
-                            </tr>
+                onClick={select_function}
+            >
 
-                            <tr>
-                                <td><Button href="#Desc">К описанию</Button></td>
-                                <td><Button href="#Hint">К подсказке</Button></td>
-                            </tr>
-
-                        </table>
-
-                    </div>
-                </Row>
-
-
-                <h3 id="Desc">Описание</h3>
-                <p>
-                    Что нужно делать, чтобы справиться с ужином? Искать курицу. Она сама угадывает ваш аппетит, пока вы возлежите. Вкусно и быстро готовится, не воняет, не жмет спину
-
-                    Бульон куриного или грибного происхождения вскипятить в половине кастрюльи. Грибы весом в 2 кг перетирают с пшеном. Пол литра сливок вскипятите. На крупной терке сделать плавление пюрешки. Будьте осторожны: существует поверье, что если бросить в вареное яйцо песок и соль, оно разрушит стены вашей квартиры, и придет в непригодность до наступления весны. Каши быстрого приготовления, разведенные уксусом - идеальный вариант начинки. Для пущего удешевления можно вместо картофеля сделать блины. Сверху кладем сало, посыпаем сыром.
-                </p>
-
-
-                <h3 id="Hint">Подсказка
-                    <Button
-                        className="p-2"
-                        aria-controls="hint-text"
-                        aria-expanded={this.state.show_hint}
-                        onClick={() => { this.setState({ show_hint: !this.state.show_hint }) }}
-                    >
-                        {this.state.show_hint ? "Спрятать" : "Показать"}
-
-                    </Button>
-                </h3>
-
-                <Fade in={this.state.show_hint}>
-                    <p id="hint-text">
-                        Что нужно делать, чтобы справиться с ужином? Искать курицу. Она сама угадывает ваш аппетит, пока вы возлежите. Вкусно и быстро готовится, не воняет, не жмет спину
-
-                        Бульон куриного или грибного происхождения вскипятить в половине кастрюльи. Грибы весом в 2 кг перетирают с пшеном. Пол литра сливок вскипятите. На крупной терке сделать плавление пюрешки. Будьте осторожны: существует поверье, что если бросить в вареное яйцо песок и соль, оно разрушит стены вашей квартиры, и придет в непригодность до наступления весны. Каши быстрого приготовления, разведенные уксусом - идеальный вариант начинки. Для пущего удешевления можно вместо картофеля сделать блины. Сверху кладем сало, посыпаем сыром.
-                    </p>
-                </Fade>
-
-
-            </Container >
-
-
+            </CacheMarker>
         )
-    }
+    }) || <></>
+
+
+
+    return (
+        <div>
+            {markers}
+        </div>
+    )
+}
+
+export type MapViewProps = {
+    cacheSelected: (id: string) => void
+}
+
+export function MapView(p: MapViewProps) {
+
+    return (
+        <MapContainer center={[59.9, 30.20]} zoom={13} className="map-container">
+            <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+
+            <MapEventHandler cacheSelected={p.cacheSelected}></MapEventHandler>
+
+        </MapContainer>
+
+    )
 }
