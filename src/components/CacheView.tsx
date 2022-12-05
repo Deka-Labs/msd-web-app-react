@@ -31,7 +31,6 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
             }).catch(
                 (reason: Error | AxiosError) => {
                     if (isAxiosError(reason)) {
-                        // Conflict: Means already registred
                         if (reason.response?.status === 404) {
                             alert("Этот тайник удален")
                             if (onCacheDeleted) onCacheDeleted();
