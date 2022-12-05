@@ -4,10 +4,6 @@ import { cache_service_get_caches, CacheView } from "../api/cache_service";
 import { CacheMarker } from "./CacheMarker";
 
 
-type MapState = {
-    show_hint: boolean,
-}
-
 type MapEventProps = {
     cacheSelected: (id: string) => void
     user_id?: number | null

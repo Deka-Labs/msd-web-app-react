@@ -7,18 +7,30 @@ type CacheViewProps = {
     unlocked?: boolean // Means that add, delete, edit buttons avaiable
 }
 
+type CacheViewState = {
+    cache: Cache | null,
+    show_hint: boolean
+}
+
 export function CacheView({ selected_id = null, unlocked = false }: CacheViewProps) {
 
-    const [cache, setCache] = useState<Cache | null>(null);
+    const [state, setState] = useState<CacheViewState>(
+        {
+            cache: null,
+            show_hint: unlocked,
+        }
+    );
 
     useEffect(() => {
         if (selected_id) {
             cache_service_get_cache(selected_id).then((r) => {
                 let cache_view = r.data;
-                setCache(cache_view.caches[0])
+                setState({ ...state, cache: cache_view.caches[0] });
             })
         }
     }, [selected_id])
+
+
 
 
     let view_cache_part = <></>
@@ -26,9 +38,10 @@ export function CacheView({ selected_id = null, unlocked = false }: CacheViewPro
     // Cache not set
     if (!selected_id) {
         view_cache_part = <h4>Выберите тайник на карте для просмотра информации о нем</h4>
-    } else if (selected_id && !cache) {
+    } else if (selected_id && !state.cache) {
         view_cache_part = <h4>Получение информации</h4>
     } else {
+
         view_cache_part = (
             <Form>
                 <h4>Положение</h4>
@@ -36,11 +49,11 @@ export function CacheView({ selected_id = null, unlocked = false }: CacheViewPro
                     <>
                         <Form.Group controlId="lat" className="col-md-6">
                             <Form.Label>Широта</Form.Label>
-                            <Form.Control type="text" title="Расположение тайника" readOnly value={String(cache?.position?.lat)}></Form.Control>
+                            <Form.Control type="text" title="Расположение тайника" readOnly value={String(state.cache?.position?.lat)}></Form.Control>
                         </Form.Group>
                         <Form.Group controlId="lng" className="col-md-6">
                             <Form.Label>Долгота</Form.Label>
-                            <Form.Control type="text" title="Расположение тайника" readOnly value={String(cache?.position?.lng)}></Form.Control>
+                            <Form.Control type="text" title="Расположение тайника" readOnly value={String(state.cache?.position?.lng)}></Form.Control>
                         </Form.Group>
                     </>
                 </Row>
@@ -53,21 +66,41 @@ export function CacheView({ selected_id = null, unlocked = false }: CacheViewPro
                             rows={5}
                             title="Описание места, чтобы заинтересовать в посещении тайника"
                             maxLength={512}
-                            value={cache?.description}
+                            value={state.cache?.description}
                         ></Form.Control>
                     </Form.Group>
                 </Row>
                 <Row>
                     <Form.Group controlId="hint">
-                        <Form.Label><h4>Подсказка</h4></Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            readOnly
-                            rows={3}
-                            title="Подсказка чтобы легче было понять где искать тайник"
-                            maxLength={256}
-                            value={cache?.hint}
-                        ></Form.Control>
+                        <Form.Label className="mt-2">
+                            <Row>
+                                <h4 className="col">Подсказка</h4>
+                                {!unlocked &&
+                                    <Button
+                                        className="col"
+                                        onClick={() => setState({ ...state, show_hint: !state.show_hint })}
+                                        aria-controls="hint-expand"
+                                        aria-expanded={state.show_hint}
+                                    >
+                                        {state.show_hint ? "Спрятать" : "Показать"}
+                                    </Button>
+                                }
+
+                            </Row>
+
+                        </Form.Label>
+                        <div id="hint-expand">
+                            <Form.Control
+                                hidden={!state.show_hint}
+                                as="textarea"
+                                readOnly
+                                rows={3}
+                                title="Подсказка чтобы легче было понять где искать тайник"
+                                maxLength={256}
+                                value={state.cache?.hint}
+                            ></Form.Control>
+                        </div>
+
                     </Form.Group>
                 </Row>
 
