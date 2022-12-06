@@ -2,6 +2,7 @@ import { AxiosError, isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { Button, Container, Form, Row } from "react-bootstrap";
 import { Cache, cache_service_delete_cache, cache_service_get_cache } from '../api/cache_service'
+import { login_service_get_name } from "../api/login_service";
 
 type CacheViewProps = {
     selected_id?: string | null,
@@ -11,6 +12,7 @@ type CacheViewProps = {
 
 type CacheViewState = {
     cache: Cache | null,
+    user: string | null,
     show_hint: boolean
 }
 
@@ -19,10 +21,12 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
     const [state, setState] = useState<CacheViewState>(
         {
             cache: null,
+            user: null,
             show_hint: unlocked,
         }
     );
 
+    // Handle selection
     useEffect(() => {
         if (selected_id) {
             cache_service_get_cache(selected_id).then((r) => {
@@ -47,6 +51,30 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
         }
     }, [selected_id])
 
+    // Handle user id change
+    useEffect(() => {
+        if (selected_id && state.cache?.owner_id) {
+            login_service_get_name(state.cache?.owner_id).then((r) => {
+                setState({ ...state, user: r.data.login });
+            }).catch(
+                (reason: Error | AxiosError) => {
+                    if (isAxiosError(reason)) {
+                        if (reason.response?.status === 404) {
+
+                        } else {
+                            alert("Внутреняя ошибка, попробуйте позже")
+                            console.log("Status code:", reason.response?.status);
+                            console.log("Body:", reason.toJSON());
+                        }
+                    } else {
+                        alert(reason)
+                    }
+
+                    setState({ ...state, user: null });
+                })
+        }
+    }, [state.cache?.owner_id])
+
 
     const deleteSelected = () => {
         if (selected_id && onCacheDeleted) {
@@ -54,6 +82,24 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
                 onCacheDeleted()
             })
         }
+    }
+
+    let owner_row = <></>
+    if (state.user && !unlocked) {
+        owner_row = (
+            <Row>
+                <Form.Group controlId="description">
+                    <Form.Label><h4>Владелец</h4></Form.Label>
+                    <Form.Control
+                        type="text"
+                        readOnly
+                        title="Ник владельца тайника"
+                        maxLength={512}
+                        value={(state.user) ? state.user : "Не найден"}
+                    ></Form.Control>
+                </Form.Group>
+            </Row>
+        )
     }
 
 
@@ -81,6 +127,7 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
                         </Form.Group>
                     </>
                 </Row>
+                {owner_row}
                 <Row>
                     <Form.Group controlId="description">
                         <Form.Label><h4>Описание</h4></Form.Label>

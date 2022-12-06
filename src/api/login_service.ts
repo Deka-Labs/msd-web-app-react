@@ -17,6 +17,10 @@ export type User = {
     email: string,
 }
 
+export type UserName = {
+    login: string,
+}
+
 function api_base(): string {
     const api_base_env = process.env.REACT_APP_LOGIN_SERVICE_ADDRESS
     if (!api_base_env) {
@@ -41,4 +45,9 @@ export function login_service_signup(create_info: UserCreateInfo) {
 export function login_service_login(login_info: UserLoginInfo) {
     const login_route = api_route("user/login")
     return axios.post<User>(login_route, login_info)
+}
+
+export function login_service_get_name(user_id: number) {
+    const user_route = api_route(`user/${user_id}/name`)
+    return axios.get<UserName>(user_route)
 }

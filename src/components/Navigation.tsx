@@ -1,9 +1,16 @@
 
+import { AxiosError, isAxiosError } from "axios";
+import { useEffect, useState } from "react";
 import { Nav, Navbar } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
+import { login_service_get_name } from "../api/login_service";
 
 
 function Navigation(): JSX.Element {
+
+    const [user, setUser] = useState<string | null>(null);
+
+
     const location = useLocation().pathname;
 
     const is_home = location === '/';
@@ -17,6 +24,34 @@ function Navigation(): JSX.Element {
     const is_signup = location === '/signup'
 
     const user_loggedin = !!localStorage.getItem("user_id")
+
+    useEffect(() => {
+        let uid = localStorage.getItem("user_id")
+        if (uid) {
+            login_service_get_name(parseInt(uid)).then(
+                (r) => {
+                    let user_name = r.data;
+                    setUser(user_name.login)
+                }
+            ).catch(
+                (reason: Error | AxiosError) => {
+                    if (isAxiosError(reason)) {
+                        if (reason.response?.status === 404) {
+                            alert("Пользователь, под которым вы вошли был удален")
+                            localStorage.clear()
+                        } else {
+                            alert("Внутреняя ошибка, попробуйте позже")
+                            console.log("Status code:", reason.response?.status);
+                            console.log("Body:", reason.toJSON());
+                        }
+                    } else {
+                        alert(reason)
+                    }
+
+                }
+            )
+        }
+    }, [])
 
 
     return (
@@ -35,7 +70,13 @@ function Navigation(): JSX.Element {
                     </Nav>
                     <Nav>
                         {user_loggedin &&
-                            <Nav.Link href="/" onClick={(_) => localStorage.clear()}>Выйти</Nav.Link>}
+                            <>
+                                {
+                                    user && <Nav.Link active>Вы вошли как {user}</Nav.Link>
+                                }
+                                <Nav.Link href="/" onClick={(_) => localStorage.clear()}>Выйти</Nav.Link>
+                            </>
+                        }
                         {!user_loggedin &&
                             <>
                                 <Nav.Link active={is_login} href="/login">Войти</Nav.Link>

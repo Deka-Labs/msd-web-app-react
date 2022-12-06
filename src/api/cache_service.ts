@@ -16,6 +16,7 @@ export type Cache = {
     position: L.LatLng,
     description: string,
     hint: string,
+    owner_id: number,
 }
 
 export type CacheView = {
