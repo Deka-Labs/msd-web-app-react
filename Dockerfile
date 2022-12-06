@@ -1,0 +1,17 @@
+FROM node:19
+ARG LOGIN_SERVICE_ADDRESS
+ARG CACHE_SERVICE_ADDRESS 
+
+WORKDIR /base
+COPY package.json .
+COPY yarn.lock .
+RUN yarn install
+RUN yarn global add serve
+
+ENV REACT_APP_LOGIN_SERVICE_ADDRESS=${LOGIN_SERVICE_ADDRESS}
+ENV REACT_APP_CACHE_SERVICE_ADDRESS=${CACHE_SERVICE_ADDRESS}
+
+COPY . .
+RUN yarn build
+
+CMD ["serve", "-s", "build"]
