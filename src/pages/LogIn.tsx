@@ -67,11 +67,10 @@ class LogIn extends React.Component<any, LogInState> {
         ).catch(
             (reason: Error | AxiosError) => {
                 if (isAxiosError(reason)) {
-                    // Conflict: Means already registred
-                    if (reason.response?.status === 409) {
-                        alert("Пользователь уже зарегистрирован")
+                    if (reason.response?.status === 404) {
+                        alert("Пользователь не найден")
                     } else if (reason.response?.status === 400) { // Invalid format
-                        alert("Невреный формат данных")
+                        alert("Неверный формат данных")
                     } else {
                         alert("Внутреняя ошибка, попробуйте позже")
                         console.log("Status code:", reason.response?.status);

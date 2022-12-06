@@ -80,7 +80,7 @@ class SignUp extends React.Component<any, SignupState> {
                     if (reason.response?.status === 409) {
                         alert("Пользователь уже зарегистрирован")
                     } else if (reason.response?.status === 400) { // Invalid format
-                        alert("Невреный формат данных")
+                        alert("Неверный формат данных")
                     } else {
                         alert("Внутреняя ошибка, попробуйте позже")
                         console.log("Status code:", reason.response?.status);
