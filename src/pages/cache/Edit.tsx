@@ -27,7 +27,8 @@ function Edit(): JSX.Element {
             _id: oid,
             position: cache_data.position,
             description: cache_data.description,
-            hint: cache_data.hint
+            hint: cache_data.hint,
+            owner_id: 0 // Owner id is set by server
         }
 
 

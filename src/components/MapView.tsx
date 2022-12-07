@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { cache_service_get_caches, CacheView } from "../api/cache_service";
 import { CacheMarker } from "./CacheMarker";
+import { MapPositionLoader } from "./MapPositionLoader";
 import { MapPositionSaver } from "./MapPositionSaver";
 
 
@@ -17,7 +18,7 @@ function MapEventHandler({ user_id = null, cacheSelected, reupdate_trigger }: Ma
 
     const [view, setView] = useState<CacheView | null>(null);
 
-    const fetchCaches = async () => {
+    const fetchCaches = () => {
         let bounds = map.getBounds();
 
         cache_service_get_caches(user_id, bounds.getSouthWest(), bounds.getNorthEast()).then(
@@ -86,6 +87,7 @@ export function MapView({ user_id = null, cacheSelected, reupdate_trigger = fals
             />
 
             <MapEventHandler user_id={user_id} cacheSelected={cacheSelected} reupdate_trigger={reupdate_trigger}></MapEventHandler>
+            <MapPositionLoader></MapPositionLoader>
             <MapPositionSaver></MapPositionSaver>
 
         </MapContainer>

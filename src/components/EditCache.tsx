@@ -68,6 +68,7 @@ export function EditCache({ cache_id = null, dataSubmitted }: EditCacheParams) {
                             alert("Внутреняя ошибка, попробуйте позже")
                             console.log("Status code:", reason.response?.status);
                             console.log("Body:", reason.toJSON());
+                            navigate("/cache/my")
                         }
                     } else {
                         alert(reason)
