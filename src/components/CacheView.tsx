@@ -84,6 +84,7 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
         }
     }
 
+    // If cache haves owner, display it
     let owner_row = <></>
     if (state.user && !unlocked) {
         owner_row = (
@@ -97,6 +98,84 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
                         maxLength={512}
                         value={(state.user) ? state.user : "Не найден"}
                     ></Form.Control>
+                </Form.Group>
+            </Row>
+        )
+    }
+
+    // Description block not empty -> show it, otherwise hide
+    let description_block = (
+        <Row>
+            <Form.Group controlId="description">
+                <Form.Label><h4>Описание: не задано</h4></Form.Label>
+            </Form.Group>
+        </Row>
+    )
+
+    if (state.cache?.description.trim().length != 0) {
+        description_block = (
+            <Row>
+                <Form.Group controlId="description">
+                    <Form.Label><h4>Описание</h4></Form.Label>
+                    <Form.Control
+                        as="textarea"
+                        readOnly
+                        rows={5}
+                        title="Описание места, чтобы заинтересовать в посещении тайника"
+                        maxLength={512}
+                        value={state.cache?.description}
+                    ></Form.Control>
+                </Form.Group>
+            </Row>
+        )
+    }
+
+    // As for description but for hint:
+    let hint_block = (
+        <Row>
+            <Form.Group controlId="hint">
+                <Form.Label className="mt-2">
+                    <Row>
+                        <h4 className="col">Подсказка: не задана</h4>
+                    </Row>
+                </Form.Label>
+            </Form.Group>
+        </Row>
+    )
+
+    if (state.cache?.hint.trim().length != 0) {
+        hint_block = (
+            <Row>
+                <Form.Group controlId="hint">
+                    <Form.Label className="mt-2">
+                        <Row>
+                            <h4 className="col">Подсказка</h4>
+                            {!unlocked &&
+                                <Button
+                                    className="col"
+                                    onClick={() => setState({ ...state, show_hint: !state.show_hint })}
+                                    aria-controls="hint-expand"
+                                    aria-expanded={state.show_hint}
+                                >
+                                    {state.show_hint ? "Спрятать" : "Показать"}
+                                </Button>
+                            }
+
+                        </Row>
+
+                    </Form.Label>
+                    <div id="hint-expand">
+                        <Form.Control
+                            hidden={!state.show_hint}
+                            as="textarea"
+                            readOnly
+                            rows={3}
+                            title="Подсказка чтобы легче было понять где искать тайник"
+                            maxLength={256}
+                            value={state.cache?.hint}
+                        ></Form.Control>
+                    </div>
+
                 </Form.Group>
             </Row>
         )
@@ -128,52 +207,8 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
                     </>
                 </Row>
                 {owner_row}
-                <Row>
-                    <Form.Group controlId="description">
-                        <Form.Label><h4>Описание</h4></Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            readOnly
-                            rows={5}
-                            title="Описание места, чтобы заинтересовать в посещении тайника"
-                            maxLength={512}
-                            value={state.cache?.description}
-                        ></Form.Control>
-                    </Form.Group>
-                </Row>
-                <Row>
-                    <Form.Group controlId="hint">
-                        <Form.Label className="mt-2">
-                            <Row>
-                                <h4 className="col">Подсказка</h4>
-                                {!unlocked &&
-                                    <Button
-                                        className="col"
-                                        onClick={() => setState({ ...state, show_hint: !state.show_hint })}
-                                        aria-controls="hint-expand"
-                                        aria-expanded={state.show_hint}
-                                    >
-                                        {state.show_hint ? "Спрятать" : "Показать"}
-                                    </Button>
-                                }
-
-                            </Row>
-
-                        </Form.Label>
-                        <div id="hint-expand">
-                            <Form.Control
-                                hidden={!state.show_hint}
-                                as="textarea"
-                                readOnly
-                                rows={3}
-                                title="Подсказка чтобы легче было понять где искать тайник"
-                                maxLength={256}
-                                value={state.cache?.hint}
-                            ></Form.Control>
-                        </div>
-
-                    </Form.Group>
-                </Row>
+                {description_block}
+                {hint_block}
 
                 {unlocked &&
                     <Row>
