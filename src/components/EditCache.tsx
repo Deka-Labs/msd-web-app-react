@@ -159,7 +159,13 @@ export function EditCache({ cache_id = null, dataSubmitted }: EditCacheParams) {
                                     {cache_id ? "Изменить" : "Добавить"}
                                 </Button>
                             </Container>
-
+                        </Row>
+                        <Row>
+                            <Container className="d-flex justify-content-center">
+                                <Button href="/cache/my" className="mt-3 w-75">
+                                    Отмена
+                                </Button>
+                            </Container>
                         </Row>
 
 
