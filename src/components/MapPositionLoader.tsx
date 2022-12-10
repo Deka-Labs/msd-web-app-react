@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMap, useMapEvents } from "react-leaflet";
+import { useMap } from "react-leaflet";
 
 
 
@@ -10,13 +10,13 @@ export function MapPositionLoader() {
         // Recover
         let lat = localStorage.getItem("map_pos_lat");
         let lng = localStorage.getItem("map_pos_lng");
-        if (lat && lng) {
-            m.setView([parseFloat(lat), parseFloat(lng)])
-        }
-
         let zoom = localStorage.getItem("map_zoom");
-        if (zoom) {
-            m.setZoom(parseFloat(zoom))
+        if (lat && lng && zoom) {
+            console.log(`Restore [${lat}, ${lng}] ${zoom}`)
+            m.setView([parseFloat(lat), parseFloat(lng)], parseFloat(zoom))
+        } else {
+            console.log(`Fallback to standart view`)
+            m.setView([59.9, 30.20], 13)
         }
     }
 
