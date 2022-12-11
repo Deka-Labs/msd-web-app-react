@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { cache_service_get_caches, CacheView } from "../api/cache_service";
 import { CacheMarker } from "./CacheMarker";
 import { MapPositionLoader } from "./MapPositionLoader";
@@ -80,15 +80,15 @@ export type MapViewProps = {
 export function MapView({ user_id = null, cacheSelected, reupdate_trigger = false }: MapViewProps) {
 
     return (
-        <MapContainer center={[59.9, 30.20]} zoom={13} className="map-container">
+        <MapContainer className="map-container">
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            <MapEventHandler user_id={user_id} cacheSelected={cacheSelected} reupdate_trigger={reupdate_trigger}></MapEventHandler>
             <MapPositionLoader></MapPositionLoader>
             <MapPositionSaver></MapPositionSaver>
+            <MapEventHandler user_id={user_id} cacheSelected={cacheSelected} reupdate_trigger={reupdate_trigger}></MapEventHandler>
 
         </MapContainer>
 

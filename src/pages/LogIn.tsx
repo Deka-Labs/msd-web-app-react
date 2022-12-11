@@ -4,11 +4,6 @@ import { Button, Container, Form } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import { login_service_login, User, UserLoginInfo } from "../api/login_service"
 
-type LogInState = {
-    info: UserLoginInfo,
-    logged_in: boolean
-}
-
 export default function LogIn() {
     const [info, setInfo] = useState<UserLoginInfo>({
         email: "",
