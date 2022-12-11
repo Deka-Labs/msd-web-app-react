@@ -1,6 +1,7 @@
 import { AxiosError, isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { Button, Container, Form, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import { Cache, cache_service_delete_cache, cache_service_get_cache } from '../api/cache_service'
 import { login_service_get_name } from "../api/login_service";
 
@@ -25,6 +26,8 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
             show_hint: unlocked,
         }
     );
+
+    const navigate = useNavigate();
 
     // Handle selection
     useEffect(() => {
@@ -60,7 +63,7 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
                 (reason: Error | AxiosError) => {
                     if (isAxiosError(reason)) {
                         if (reason.response?.status === 404) {
-
+                            setState({ ...state, user: null });
                         } else {
                             alert("Внутреняя ошибка, попробуйте позже")
                             console.log("Status code:", reason.response?.status);
@@ -80,7 +83,24 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
         if (selected_id && onCacheDeleted) {
             cache_service_delete_cache(selected_id).then(() => {
                 onCacheDeleted()
-            })
+            }).catch(
+                (reason: Error | AxiosError) => {
+                    if (isAxiosError(reason)) {
+                        if (reason.response?.status === 401) {
+                            alert("Необходимо перезайти для удаления тайника")
+                            localStorage.clear()
+                            navigate("/")
+                        } else {
+                            alert("Внутреняя ошибка, попробуйте позже")
+                            console.log("Status code:", reason.response?.status);
+                            console.log("Body:", reason.toJSON());
+                        }
+                    } else {
+                        alert(reason)
+                    }
+
+                }
+            )
         }
     }
 

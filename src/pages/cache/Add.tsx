@@ -2,7 +2,6 @@ import { AxiosError, isAxiosError } from "axios"
 import { useNavigate } from "react-router-dom"
 import { CacheCreateInfo, cache_service_insert_cache } from "../../api/cache_service"
 import { EditCache, EditCacheState } from "../../components/EditCache"
-import { MapSelectPoint } from "../../components/MapSelectPoint"
 
 
 
@@ -30,6 +29,7 @@ function Add(): JSX.Element {
                 if (isAxiosError(reason)) {
                     if (reason.response?.status === 401) {
                         alert("Необходимо войти на сайт перед добавлением")
+                        localStorage.clear()
                     } else {
                         alert("Внутреняя ошибка, попробуйте позже")
                         console.log("Status code:", reason.response?.status);
@@ -39,6 +39,8 @@ function Add(): JSX.Element {
                 } else {
                     alert(reason)
                 }
+
+                navigate("/")
 
             }
         )

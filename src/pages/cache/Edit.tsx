@@ -41,7 +41,9 @@ function Edit(): JSX.Element {
             (reason: Error | AxiosError) => {
                 if (isAxiosError(reason)) {
                     if (reason.response?.status === 401) {
-                        alert("Необходимо войти на сайт перед добавлением")
+                        alert("Необходимо войти на сайт перед изменением")
+                        // Remove login info it is not valid
+                        localStorage.clear()
                     } else {
                         alert("Внутреняя ошибка, попробуйте позже")
                         console.log("Status code:", reason.response?.status);
@@ -52,6 +54,7 @@ function Edit(): JSX.Element {
                     alert(reason)
                 }
 
+                navigate("/")
             }
         )
         console.log(cache)
