@@ -51,7 +51,7 @@ function Navigation(): JSX.Element {
                 }
             )
         }
-    }, [])
+    })
 
 
     return (
