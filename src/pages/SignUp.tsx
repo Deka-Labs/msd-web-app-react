@@ -1,8 +1,7 @@
 import { AxiosError, isAxiosError } from "axios"
-import { info } from "console"
 import React, { useState } from "react"
 import { Button, Container, Form } from "react-bootstrap"
-import { Navigate, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { login_service_signup, User, UserCreateInfo } from "../api/login_service"
 
 

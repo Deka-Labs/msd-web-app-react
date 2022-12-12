@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { cache_service_get_caches, CacheView } from "../api/cache_service";
 import { CacheMarker } from "./CacheMarker";
@@ -18,20 +18,21 @@ function MapEventHandler({ user_id = null, cacheSelected, reupdate_trigger }: Ma
 
     const [view, setView] = useState<CacheView | null>(null);
 
-    const fetchCaches = () => {
+    const fetchCaches = useCallback(() => {
         let bounds = map.getBounds();
-
         cache_service_get_caches(user_id, bounds.getSouthWest(), bounds.getNorthEast()).then(
             (response) => {
                 setView(response.data)
             }
         ).catch((r) => console.log(r))
-    }
+    }, [map, user_id]);
+
+
 
     useEffect(() => {
         fetchCaches()
     },
-        [reupdate_trigger]);
+        [reupdate_trigger, fetchCaches]);
 
 
     useMapEvents({

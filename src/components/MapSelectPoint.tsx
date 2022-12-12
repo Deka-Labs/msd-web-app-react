@@ -17,7 +17,7 @@ export function SelectedPoint(props: MapSelectPointProps) {
             map.flyTo(props.position)
         }
 
-    }, [props.position])
+    }, [props.position, map])
 
     useMapEvents({
         click: (e) => {
