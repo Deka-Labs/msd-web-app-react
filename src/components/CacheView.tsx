@@ -11,21 +11,12 @@ type CacheViewProps = {
     onCacheDeleted?: (() => void) | null
 }
 
-type CacheViewState = {
-    cache: Cache | null,
-    user: string | null,
-    show_hint: boolean
-}
-
 export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted = null }: CacheViewProps) {
 
-    const [state, setState] = useState<CacheViewState>(
-        {
-            cache: null,
-            user: null,
-            show_hint: unlocked,
-        }
-    );
+    const [cache, setCache] = useState<Cache | null>(null);
+    const [user, setUser] = useState<string | null>(null);
+    const [showHint, setShowHint] = useState<boolean>(unlocked)
+
 
     const navigate = useNavigate();
 
@@ -34,7 +25,7 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
         if (selected_id) {
             cache_service_get_cache(selected_id).then((r) => {
                 let cache_view = r.data;
-                setState({ ...state, cache: cache_view.caches[0] });
+                setCache(cache_view.caches[0])
             }).catch(
                 (reason: Error | AxiosError) => {
                     if (isAxiosError(reason)) {
@@ -52,18 +43,18 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
 
                 })
         }
-    }, [selected_id])
+    }, [selected_id, onCacheDeleted])
 
     // Handle user id change
     useEffect(() => {
-        if (selected_id && state.cache?.owner_id) {
-            login_service_get_name(state.cache?.owner_id).then((r) => {
-                setState({ ...state, user: r.data.login });
+        if (selected_id && cache?.owner_id) {
+            login_service_get_name(cache?.owner_id).then((r) => {
+                setUser(r.data.login)
             }).catch(
                 (reason: Error | AxiosError) => {
                     if (isAxiosError(reason)) {
                         if (reason.response?.status === 404) {
-                            setState({ ...state, user: null });
+                            setUser(null)
                         } else {
                             alert("Внутреняя ошибка, попробуйте позже")
                             console.log("Status code:", reason.response?.status);
@@ -73,10 +64,10 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
                         alert(reason)
                     }
 
-                    setState({ ...state, user: null });
+                    setUser(null)
                 })
         }
-    }, [state.cache?.owner_id])
+    }, [cache?.owner_id, selected_id])
 
 
     const deleteSelected = () => {
@@ -106,7 +97,7 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
 
     // If cache haves owner, display it
     let owner_row = <></>
-    if (state.user && !unlocked) {
+    if (user && !unlocked) {
         owner_row = (
             <Row>
                 <Form.Group controlId="description">
@@ -116,7 +107,7 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
                         readOnly
                         title="Ник владельца тайника"
                         maxLength={512}
-                        value={(state.user) ? state.user : "Не найден"}
+                        value={(user) ? user : "Не найден"}
                     ></Form.Control>
                 </Form.Group>
             </Row>
@@ -132,7 +123,7 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
         </Row>
     )
 
-    if (state.cache?.description.trim().length != 0) {
+    if (cache?.description.trim().length !== 0) {
         description_block = (
             <Row>
                 <Form.Group controlId="description">
@@ -143,7 +134,7 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
                         rows={5}
                         title="Описание места, чтобы заинтересовать в посещении тайника"
                         maxLength={512}
-                        value={state.cache?.description}
+                        value={cache?.description}
                     ></Form.Control>
                 </Form.Group>
             </Row>
@@ -163,7 +154,7 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
         </Row>
     )
 
-    if (state.cache?.hint.trim().length != 0) {
+    if (cache?.hint.trim().length !== 0) {
         hint_block = (
             <Row>
                 <Form.Group controlId="hint">
@@ -173,11 +164,11 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
                             {!unlocked &&
                                 <Button
                                     className="col"
-                                    onClick={() => setState({ ...state, show_hint: !state.show_hint })}
+                                    onClick={() => setShowHint((show: boolean) => { return !show })}
                                     aria-controls="hint-expand"
-                                    aria-expanded={state.show_hint}
+                                    aria-expanded={showHint}
                                 >
-                                    {state.show_hint ? "Спрятать" : "Показать"}
+                                    {showHint ? "Спрятать" : "Показать"}
                                 </Button>
                             }
 
@@ -186,13 +177,13 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
                     </Form.Label>
                     <div id="hint-expand">
                         <Form.Control
-                            hidden={!state.show_hint}
+                            hidden={!showHint}
                             as="textarea"
                             readOnly
                             rows={3}
                             title="Подсказка чтобы легче было понять где искать тайник"
                             maxLength={256}
-                            value={state.cache?.hint}
+                            value={cache?.hint}
                         ></Form.Control>
                     </div>
 
@@ -207,7 +198,7 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
     // Cache not set
     if (!selected_id) {
         view_cache_part = <h4>Выберите тайник на карте для просмотра информации о нем</h4>
-    } else if (selected_id && !state.cache) {
+    } else if (selected_id && !cache) {
         view_cache_part = <h4>Получение информации</h4>
     } else {
 
@@ -218,11 +209,11 @@ export function CacheView({ selected_id = null, unlocked = false, onCacheDeleted
                     <>
                         <Form.Group controlId="lat" className="col-md-6">
                             <Form.Label>Широта</Form.Label>
-                            <Form.Control type="text" title="Расположение тайника" readOnly value={String(state.cache?.position?.lat)}></Form.Control>
+                            <Form.Control type="text" title="Расположение тайника" readOnly value={String(cache?.position?.lat)}></Form.Control>
                         </Form.Group>
                         <Form.Group controlId="lng" className="col-md-6">
                             <Form.Label>Долгота</Form.Label>
-                            <Form.Control type="text" title="Расположение тайника" readOnly value={String(state.cache?.position?.lng)}></Form.Control>
+                            <Form.Control type="text" title="Расположение тайника" readOnly value={String(cache?.position?.lng)}></Form.Control>
                         </Form.Group>
                     </>
                 </Row>
