@@ -3,4 +3,4 @@ React based frontend for game KARTofel - basic implementation of cache searching
 
 ## Connected projects
   * [msd-login-service](https://github.com/Deka-Labs/msd-login-service) - microservice for managing users
-  * [msd-cache-service](https://github.com/Deka-Labs/msd-cache-service) - microservice for stroing caches
+  * [msd-cache-service](https://github.com/Deka-Labs/msd-cache-service) - microservice for managing caches
